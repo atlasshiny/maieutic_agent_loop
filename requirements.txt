@@ -1,0 +1,5 @@
+ollama
+langchain-ollama
+langchain-core
+langgraph
+langgraph-checkpoint
