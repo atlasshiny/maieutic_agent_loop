@@ -1,5 +1,6 @@
 from langchain_ollama import ChatOllama
 from langchain_core.messages import SystemMessage, HumanMessage
+from agent_state import SocraticState
 
 class SocraticAgents():
     def __init__(self, context_switch: bool = True):
@@ -36,17 +37,58 @@ class SocraticAgents():
             "dialectic": "Evaluate the user's progress. Assign a mastery score from 0.0 to 1.0."
         }
 
-    def arbiter_node():
-        pass
+    def _parse_score(self, ai_output: str) -> float:
+        """Helper to extract a numerical score from the Dialectic agent's text."""
+        import re
+        try:
+            # Look for any decimal number in the response (e.g., '0.8' or 'Score: 0.5')
+            match = re.search(r"(\d\.\d)", ai_output)
+            if match:
+                return float(match.group(1))
+            return 0.0 # Default if no score found
+        except Exception:
+            return 0.0
 
-    def elenchus_node():
-        pass
+    def arbiter_node(self, state: SocraticState):
+        # get prompt from prompt dict
+        prompt = self.prompts["arbiter"]
+        
+        messages = [SystemMessage(content=prompt)] + state["messages"]
+        response = self.arbiter_llm.invoke(messages)
+        
+        # We extract the name of the next agent (e.g., 'elenchus') 
+        # so the graph knows which edge to take.
+        return {"next_agent": response.content.strip().lower()}
 
-    def aporia_node():
-        pass
+    def elenchus_node(self, state: SocraticState):
+        prompt = self.prompts["elenchus"]
 
-    def maieutics_node():
-        pass
+        messages = [SystemMessage(content=prompt)] + state["messages"]
+        response = self.elenchus_llm.invoke(messages)
 
-    def dialectic_node():
-        pass
+        return {"messages": [response]}
+
+    def aporia_node(self, state: SocraticState):
+        prompt = self.prompts["aporia"]
+
+        messages = [SystemMessage(content=prompt)] + state["messages"]
+        response = self.aporia_llm.invoke(messages)
+
+        return {"messages": [response]}
+
+    def maieutics_node(self, state: SocraticState):
+        prompt = self.prompts["maieutics"]
+
+        messages = [SystemMessage(content=prompt)] + state["messages"]
+        response = self.maieutics_llm.invoke(messages)
+
+        return {"messages": [response]}
+
+    def dialectic_node(self, state: SocraticState):
+        prompt = self.prompts["dialectic"]
+
+        messages = [SystemMessage(content=prompt)] + state["messages"]
+        response = self.dialectic_llm.invoke(messages)
+        
+        score = self._parse_score(response.content) 
+        return {"mastery_score": score}
