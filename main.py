@@ -3,6 +3,9 @@ from agent_graph import create_agent_graph
 from langchain_core.messages import HumanMessage
 
 def main():
+    """
+    Main entry point for the Socratic agent loop. Handles user input, runs the agent graph, and displays output.
+    """
     agents = SocraticAgents(context_switch=False)
 
     loop = create_agent_graph(agents=agents)

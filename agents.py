@@ -3,7 +3,13 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from agent_state import SocraticState 
 
 class SocraticAgents():
+    """
+    A collection of agent nodes for Socratic dialogue, each representing a different role in the learning process.
+    """
     def __init__(self, context_switch: bool = True):
+        """
+        Initialize all agent LLMs and their prompts. Optionally switch context for model selection.
+        """
         ollama_backend = "cuda"
 
         if context_switch:
@@ -40,6 +46,11 @@ class SocraticAgents():
         }
 
     def _parse_score(self, ai_output: str) -> float:
+        """
+        Extract a numerical mastery score from the Dialectic agent's output string.
+        Returns:
+            float: The parsed score, or 0.0 if not found.
+        """
         """Helper to extract a numerical score from the Dialectic agent's text."""
         import re
         try:
@@ -52,6 +63,11 @@ class SocraticAgents():
             return 0.0
 
     def arbiter_node(self, state: SocraticState):
+        """
+        Arbiter node: Decides which agent should handle the next step based on the conversation state.
+        Returns:
+            dict: Contains the name of the next agent.
+        """
         # get prompt from prompt dict
         prompt = self.prompts["arbiter"]
         
@@ -63,6 +79,11 @@ class SocraticAgents():
         return {"next_agent": response.content.strip().lower()}
 
     def elenchus_node(self, state: SocraticState):
+        """
+        Elenchus node: Challenges the user's statements for logical rigor and contradiction.
+        Returns:
+            dict: Contains the agent's response messages.
+        """
         prompt = self.prompts["elenchus"]
 
         messages = [SystemMessage(content=prompt)] + state["messages"]
@@ -71,6 +92,11 @@ class SocraticAgents():
         return {"messages": [response]}
 
     def aporia_node(self, state: SocraticState):
+        """
+        Aporia node: Introduces productive doubt and paradoxes to deepen understanding.
+        Returns:
+            dict: Contains the agent's response messages.
+        """
         prompt = self.prompts["aporia"]
 
         messages = [SystemMessage(content=prompt)] + state["messages"]
@@ -79,6 +105,11 @@ class SocraticAgents():
         return {"messages": [response]}
 
     def maieutics_node(self, state: SocraticState):
+        """
+        Maieutics node: Guides the user to discover knowledge through analogies and scaffolding.
+        Returns:
+            dict: Contains the agent's response messages.
+        """
         prompt = self.prompts["maieutics"]
 
         messages = [SystemMessage(content=prompt)] + state["messages"]
@@ -87,6 +118,11 @@ class SocraticAgents():
         return {"messages": [response]}
 
     def dialectic_node(self, state: SocraticState):
+        """
+        Dialectic node: Evaluates the user's mastery and assigns a score.
+        Returns:
+            dict: Contains the mastery score.
+        """
         prompt = self.prompts["dialectic"]
 
         messages = [SystemMessage(content=prompt)] + state["messages"]

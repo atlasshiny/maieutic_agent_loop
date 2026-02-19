@@ -3,6 +3,13 @@ from agent_state import SocraticState
 from agents import SocraticAgents
 
 def create_agent_graph(agents: SocraticAgents):
+    """
+    Construct the agent graph, adding nodes and conditional edges for Socratic dialogue.
+    Args:
+        agents (SocraticAgents): The collection of agent node callables.
+    Returns:
+        Compiled graph ready for execution.
+    """
     # Create the state for the graph
     state = StateGraph(SocraticState)
 
