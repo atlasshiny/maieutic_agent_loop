@@ -30,10 +30,8 @@ def create_agent_graph(agents: SocraticAgents):
     state.add_edge("aporia", "dialectic")
     state.add_edge("maieutics", "dialectic")
 
-    # Dialectic conditional edge: mastery_score determines next node or END
-    state.add_conditional_edges(
-        "dialectic",
-        lambda state: END if state.get("mastery_score", 0.0) >= 0.9 else "arbiter"
-    )
+    # Dialectic should conclude the current processing stream and return control to the user
+    # (next user input will re-trigger the arbiter). End this execution after dialectic.
+    state.add_edge("dialectic", END)
 
     return state.compile()
