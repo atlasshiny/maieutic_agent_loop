@@ -70,11 +70,34 @@ class SocraticAgents():
         """
         if not ai_output:
             return "maieutics"
-        text = ai_output.lower()
-        candidates = ["arbiter", "elenchus", "aporia", "maieutics", "dialectic"]
+        text = ai_output.strip().lower()
+        candidates = ["elenchus", "aporia", "maieutics"]
+        # Prefer exact single-token replies
+        if text in candidates:
+            return text
+        # Check for a line that is exactly one of the tokens
+        for line in text.splitlines():
+            token = line.strip().strip(':,.')
+            if token in candidates:
+                return token
+        # Fallback: search for token occurrence anywhere
         for c in candidates:
             if c in text:
                 return c
+        return "maieutics"
+
+    def _parse_route(self, ai_output: str, candidates: list, default: str) -> str:
+        """
+        Parse a model output for a route token from a list of candidate node names.
+        Returns the first matching candidate found in the text, otherwise returns the default.
+        """
+        if not ai_output:
+            return default
+        text = ai_output.lower()
+        for c in candidates:
+            if c in text:
+                return c
+        return default
 
     def arbiter_node(self, state: SocraticState):
         """
@@ -91,7 +114,8 @@ class SocraticAgents():
         # We extract the name of the next agent (e.g., 'elenchus') 
         # so the graph knows which edge to take.
         next_agent = self._parse_next_agent(response.content)
-        return {"next_agent": next_agent}
+        # include raw arbiter output for debugging; routing uses next_agent
+        return {"next_agent": next_agent, "arbiter_raw": response.content}
 
     def elenchus_node(self, state: SocraticState):
         """
