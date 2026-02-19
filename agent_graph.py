@@ -25,14 +25,10 @@ def create_agent_graph(agents: SocraticAgents):
     # Arbiter conditional edge: next_agent determines next node
     state.add_conditional_edges("arbiter", lambda state: state["next_agent"])
 
-    # Elenchus conditional edge: route determines next node
-    state.add_conditional_edges("elenchus", lambda state: state.get("route"))
-
-    # Aporia conditional edge: route determines next node
-    state.add_conditional_edges("aporia", lambda state: state.get("route"))
-
-    # Maieutics conditional edge: route determines next node
-    state.add_conditional_edges("maieutics", lambda state: state.get("route"))
+    # After the chosen agent (elenchus/aporia/maieutics) runs, always go to dialectic for evaluation
+    state.add_edge("elenchus", "dialectic")
+    state.add_edge("aporia", "dialectic")
+    state.add_edge("maieutics", "dialectic")
 
     # Dialectic conditional edge: mastery_score determines next node or END
     state.add_conditional_edges(
