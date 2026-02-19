@@ -12,10 +12,10 @@ class SocraticAgents():
         else:
             arbiter_model = elenchus_model = aporia_model = maieutics_model = dialectic_model = "llama3.1:8b-instruct-q2_K"
 
-        # The Orchestrator: High precision for logical routing and intent classification. t=0 for deterministic pathing.
+        # The Orchestrator: Lowest temperature (0.0) for high precision, logical routing, and intent classification.
         self.arbiter_llm = ChatOllama(model=arbiter_model, temperature=0.0)
 
-        # The Adversary: Tuned for logical rigor and cross-examination. Low temperature for solid, factual responses
+        # The Adversary: Tuned for logical rigor and cross-examination. Low temperature (0.1) for solid, factual responses
         self.elenchus_llm = ChatOllama(model=elenchus_model, temperature=0.1)
 
         # The Puzzler: Slightly higher temperature (0.7) to allow for creative analogies and the generation of 'productive doubt' paradoxes.
@@ -24,7 +24,7 @@ class SocraticAgents():
         #The Midwife: Balanced temperature (0.5) for clear, constructive scaffolding and analogy-based knowledge synthesis.
         self.maieutics_llm = ChatOllama(model=maieutics_model, temperature=0.5)
 
-        #The Auditor: Evaluates state transitions and verifies concept mastery. t=0 for objectiveness and determinism.
+        #The Auditor: Evaluates state transitions and verifies concept mastery. Lowest temperature (0.0) for objectiveness and determinism.
         self.dialectic_llm = ChatOllama(model=dialectic_model, temperature=0.0)
 
         # The system "objective" prompts
