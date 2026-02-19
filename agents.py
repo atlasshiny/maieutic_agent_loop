@@ -62,6 +62,20 @@ class SocraticAgents():
         except Exception:
             return 0.0
 
+    def _parse_next_agent(self, ai_output: str) -> str:
+        """
+        Extract a canonical next-agent name from the Arbiter's output.
+        Searches for known agent names in the model output and returns the first match.
+        Falls back to 'maieutics' when no known agent is found.
+        """
+        if not ai_output:
+            return "maieutics"
+        text = ai_output.lower()
+        candidates = ["arbiter", "elenchus", "aporia", "maieutics", "dialectic"]
+        for c in candidates:
+            if c in text:
+                return c
+
     def arbiter_node(self, state: SocraticState):
         """
         Arbiter node: Decides which agent should handle the next step based on the conversation state.
@@ -76,7 +90,8 @@ class SocraticAgents():
         
         # We extract the name of the next agent (e.g., 'elenchus') 
         # so the graph knows which edge to take.
-        return {"next_agent": response.content.strip().lower()}
+        next_agent = self._parse_next_agent(response.content)
+        return {"next_agent": next_agent}
 
     def elenchus_node(self, state: SocraticState):
         """
