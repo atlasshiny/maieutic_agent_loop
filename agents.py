@@ -119,19 +119,6 @@ class SocraticAgents():
                 return c
         return "maieutics"
 
-    def _parse_route(self, ai_output: str, candidates: list, default: str) -> str:
-        """
-        Parse a model output for a route token from a list of candidate node names.
-        Returns the first matching candidate found in the text, otherwise returns the default.
-        """
-        if not ai_output:
-            return default
-        text = ai_output.lower()
-        for c in candidates:
-            if c in text:
-                return c
-        return default
-
     def arbiter_node(self, state: SocraticState):
         """
         Arbiter node: Decides which agent should handle the next step based on the conversation state.
