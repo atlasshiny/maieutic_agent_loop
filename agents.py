@@ -188,4 +188,4 @@ class SocraticAgents():
         response = self.dialectic_llm.invoke(messages)
         
         score = self._parse_score(response.content) 
-        return {"mastery_score": score}
+        return {"mastery_score": score, "dialectic_raw": response.content}
