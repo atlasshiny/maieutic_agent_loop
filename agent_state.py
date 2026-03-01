@@ -9,5 +9,9 @@ class SocraticState(TypedDict):
     messages: Annotated[List[BaseMessage], operator.add]
     next_agent: str
     mastery_score: float
+    mastery_threshold: float
+    mastery_reached: bool
+    loop_count: int
+    max_internal_loops: int
     arbiter_raw: str
     dialectic_raw: str
