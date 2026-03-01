@@ -186,6 +186,12 @@ class SocraticAgents():
 
         messages = [SystemMessage(content=prompt)] + state["messages"]
         response = self.dialectic_llm.invoke(messages)
-        
-        score = self._parse_score(response.content) 
-        return {"mastery_score": score, "dialectic_raw": response.content}
+
+        score = self._parse_score(response.content)
+        threshold = float(state.get("mastery_threshold", 0.9) or 0.9)
+
+        return {
+            "mastery_score": score,
+            "mastery_reached": score >= threshold,
+            "dialectic_raw": response.content,
+        }
