@@ -10,7 +10,7 @@ Lightweight orchestration for a Socratic-style multi-agent loop using LangGraph 
 ## Overview
 
 - Purpose: run a small ensemble of role-based agents (Arbiter, Elenchus, Aporia, Maieutics, Dialectic) to guide a user through Socratic dialogue and evaluate mastery.
-- Flow: `arbiter` -> chosen agent (`elenchus` | `aporia` | `maieutics`) -> `dialectic` -> END (user provides next input).
+- Flow: `arbiter` -> chosen agent (`elenchus` | `aporia` | `maieutics`) -> `dialectic` -> (`arbiter` loop while mastery is below threshold) -> END.
 
 This repository provides a minimal CLI runner, agent implementations, and a graph that routes between agents.
 
@@ -55,7 +55,7 @@ Type a question when prompted. Enter `options` to change settings. Enter `quit` 
 
 - Models and temperatures are set in `agents.py`. Change model names there to swap models or reduce VRAM usage (choose smaller models for limited GPUs).
 - The `arbiter` prompt is intentionally strict: it is instructed to reply with a single token (one of `elenchus`, `aporia`, `maieutics`) to avoid routing ambiguity.
-- The graph is defined in `agent_graph.py`. The current flow ensures evaluation by `dialectic` after each chosen-agent response and then ends the run so the user must enter the next prompt to continue.
+- The graph is defined in `agent_graph.py`. The current flow ensures evaluation by `dialectic` after each chosen-agent response and loops internally until mastery is reached.
 
 ## Debugging
 
