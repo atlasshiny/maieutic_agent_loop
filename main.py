@@ -79,6 +79,8 @@ def main():
     history_enabled = HISTORY_ENABLED_DEFAULT
     history = load_history(history_path) if history_enabled else []
     context_token_budget = CONTEXT_TOKEN_BUDGET
+    mastery_score = 0.0
+    mastery_threshold = 0.9
 
     print("Change options with `options` or reset with 'reset'")
     while True:
@@ -106,11 +108,12 @@ def main():
             continue
         if cmd in ("reset", "reset history", "history reset"):
             history = []
+            mastery_score = 0.0
             try:
                 reset_history(history_path)
             except Exception:
                 pass
-            print("History reset; conversation memory cleared.")
+            print("History reset; conversation memory and mastery score cleared.")
             continue
 
         user_message = HumanMessage(content=user_input)
@@ -119,7 +122,14 @@ def main():
         agent_messages = []
 
         # Stream the graph execution
-        for event in loop.stream({"messages": turn_messages}):
+        graph_input = {
+            "messages": turn_messages,
+            "mastery_score": mastery_score,
+            "mastery_threshold": mastery_threshold,
+            "mastery_reached": False,
+        }
+
+        for event in loop.stream(graph_input):
             for node_name, output in event.items():
                 # Print messages from the agents so the user can see the communication
                 if "messages" in output:
@@ -136,6 +146,7 @@ def main():
                     logger.debug("[DIALECTIC_RAW]: %s", output['dialectic_raw'])
                 if "mastery_score" in output:
                     score = output['mastery_score']
+                    mastery_score = score
                     print(f"--- Current Mastery Score: {score} ---")
                     if score >= 0.9:
                         print("*** Mastery threshold reached (>= 0.9). You may start a new topic. ***")
