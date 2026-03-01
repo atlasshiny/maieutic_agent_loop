@@ -2,6 +2,17 @@ from langgraph.graph import StateGraph, END
 from agent_state import SocraticState
 from agents import SocraticAgents
 
+
+def _route_after_dialectic(state: SocraticState) -> str:
+    """
+    Route back into the teaching loop until mastery is reached.
+    """
+    mastery_reached = bool(state.get("mastery_reached", False))
+
+    if mastery_reached:
+        return END
+    return "arbiter"
+
 def create_agent_graph(agents: SocraticAgents):
     """
     Construct the agent graph, adding nodes and conditional edges for Socratic dialogue.
@@ -30,8 +41,7 @@ def create_agent_graph(agents: SocraticAgents):
     state.add_edge("aporia", "dialectic")
     state.add_edge("maieutics", "dialectic")
 
-    # Dialectic always ends the current graph execution.
-    # The outer while-loop in main.py re-prompts the user and re-invokes the graph with updated history, so the user can respond each cycle.
-    state.add_edge("dialectic", END)
+    # Dialectic conditionally loops back into the graph until mastery is reached.
+    state.add_conditional_edges("dialectic", _route_after_dialectic)
 
     return state.compile()
