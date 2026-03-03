@@ -36,5 +36,5 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        # Run all files starting with test_*.py
-        python -m pytest -v
+        # Run all files starting with test_*.py, excluding tests that need a local Ollama install
+        python -m pytest -v --ignore=tests/test_ollama.py
